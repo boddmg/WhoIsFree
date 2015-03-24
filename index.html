@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>排班小工具</title>
+    <link href="main.css" rel="stylesheet">
+    <link href="bootstrap-switch.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="bootstrap-switch.min.js"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="container">
+        <div class="text-center">
+            <div id="acters-list">
+            </div>
+            <span>可排场次</span>
+            <div id="vaild-acts">
+            </div>
+        </div>
+    </div>
+</body>
+<footer>
+    <script>
+    (function() {
+        window.acts = {
+            "1-1": ["潘大龙", "克里斯", "西维欧", "伦巴第", "毕老板", "丁娜"],
+            "1-2": ["潘大龙", "克里斯", "西维欧", "伦巴第", "毕老板", "丁娜", "楚法丁诺", "比雅"],
+            "2-1": ["楚法丁诺"],
+            "2-2": ["楚法丁诺", "弗林都"],
+            "2-3": ["楚法丁诺", "弗林都", "毕老板"],
+            "2-4": ["楚法丁诺", "弗林都", "西维欧"],
+            "2-5": ["楚法丁诺", "弗林都"],
+            "2-6": ["楚法丁诺"],
+            "2-7": ["楚法丁诺", "比雅"],
+            "2-8": ["楚法丁诺", "潘大龙", "伦巴第", "弗林都"],
+            "3-1": ["潘大龙", "克里斯", "比雅"],
+            "4-1": ["西维欧", "伦巴第", "潘大龙"],
+            "4-2": ["西维欧", "潘大龙"],
+            "4-3": ["西维欧", "克丽丝", "潘大龙", "西维欧"],
+            "4-4": ["西维欧", "克丽丝", "丁娜"],
+            "5-1": ["楚法丁诺", "弗林都", "比雅"],
+            "5-2": ["楚法丁诺", "潘大龙", "比雅", "毕老板"],
+            "5-3": ["楚法丁诺", "伦巴第", "弗林都"],
+            "6-1": ["楚法丁诺", "丁娜"],
+            "6-2": ["楚法丁诺", "弗林都", "比雅", "潘大龙", "丁娜"],
+            "7-1": ["楚法丁诺", "弗林都"],
+            "7-2": ["楚法丁诺", "潘大龙", "比雅"],
+            "8": ["丁娜", "西维欧", "克丽丝", "潘大龙", "伦巴第"],
+            "9-1": ["楚法丁诺", "弗林都", "比雅"],
+            "9-2": ["楚法丁诺", "弗林都", "比雅", "毕老板", "伦巴第", "丁娜", "西维欧", "潘大龙"],
+            "9-3": ["楚法丁诺", "潘大龙", "伦巴第"],
+        }
+        window.acters = {
+            "李枭": "潘大龙",
+            "陈曦": "克里斯",
+            "张孝慈": "西维欧",
+            "曹伟涛": "伦巴第",
+            "balls": "毕老板",
+            "梁程瑶": "丁娜",
+            "王果": "楚法丁诺",
+            "林双双": "比雅",
+            "黄安杰": "弗林都"
+        }
+        for (var i in window.acters) {
+            $("#acters-list").html($("#acters-list").html() + 
+            	"<div><div>" + i + "</div>" + 
+            	"<input id=\"" + window.acters[i] + "\" type=\"checkbox\" checked data-on-text=\"在\" data-off-text=\"不在\" /></div>")
+        };
+        $("[type='checkbox']").bootstrapSwitch();
+
+        $("[type='checkbox']").on('switchChange.bootstrapSwitch', function(event, state) {
+        	refresh_vaild_acts(calculate_the_list());
+		});
+
+		refresh_vaild_acts = function (vaild_acts) {
+			var acts = vaild_acts;
+        	var text = "";
+        	for (var i in acts){
+        		text += acts[i];
+        		text += "、";
+        	}
+        	text = text.substr(0,text.length-1);
+        	$("#vaild-acts").text(text);
+	
+		}
+
+        calculate_the_list = function () {
+        	var current_state = {};
+        	var current_state_dom = $("[type='checkbox']");
+        	var vaild_acts = [];
+        	for (var i = current_state_dom.length - 1; i >= 0; i--) {
+        		current_state[current_state_dom[i].id] = !($(current_state_dom[i]).bootstrapSwitch('state'));
+        	};
+
+        	for (var act in window.acts){
+        		var is_vaild = true;
+        		for (var acter in window.acts[act]){
+        			if(current_state[window.acts[act][acter]]){
+        				is_vaild = false;
+        				break;
+        			}
+        		}
+        		if(is_vaild){
+        			vaild_acts.push(act);
+        		}
+        	}
+        	return vaild_acts;
+        }
+    	refresh_vaild_acts(calculate_the_list());
+    })();
+    </script>
+</footer>
+
+</html>
